@@ -79,7 +79,7 @@
   color: #27ae60;
 }
 
-/* Agrega esto al final de tu frontend/src/styles/Dashboard.css */
+/* --- Formulario --- */
 .form-container {
   background: #ffffff;
   padding: 20px;
@@ -124,8 +124,85 @@
   background-color: #219653;
 }
 
-/* Estilo para el botón de eliminar en la tabla */
-.btn-eliminar {
+/* --- Alertas y Errores --- */
+.error-message,
+.dashboard-error-alert {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+  font-size: 13px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+/* --- Cabecera de la Tabla y Filtros --- */
+.dashboard-table-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard-filter-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.dashboard-filter-dropdown {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.dashboard-filter-dropdown:focus {
+  border-color: #27ae60;
+}
+
+.dashboard-table-empty-row {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 20px !important;
+  font-style: italic;
+}
+
+/* --- Acciones de la Tabla (Botones y Confirmación) --- */
+.dashboard-acciones-celda {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 32px;
+}
+
+.dashboard-action-edit-btn {
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboard-action-edit-btn:hover {
+  background-color: #d68910;
+}
+
+.dashboard-action-delete-btn {
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -137,18 +214,142 @@
   transition: background 0.2s;
 }
 
-.btn-eliminar:hover {
+.dashboard-action-delete-btn:hover {
   background-color: #c0392b;
 }
 
-/* Estilo para la alerta de error visual */
-.error-message {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 10px 15px;
+/* --- Caja de Confirmación de Borrado (Tamaño mejorado y cómodo) --- */
+.dashboard-confirm-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fdf2f2;
+  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #f5c6cb;
+}
+
+.dashboard-confirm-text {
   font-size: 13px;
-  margin-bottom: 15px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #c0392b;
+  white-space: nowrap;
+}
+
+.dashboard-action-yes-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboard-action-yes-btn:hover {
+  background-color: #c0392b;
+}
+
+.dashboard-action-no-btn {
+  background-color: #95a5a6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboard-action-no-btn:hover {
+  background-color: #7f8c8d;
+}
+
+/* --- Estilos para la Pantallita Modal de Confirmación --- */
+.dashboard-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: dashboardFadeIn 0.2s ease-in-out;
+}
+
+.dashboard-modal-card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.dashboard-modal-card h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.dashboard-modal-card p {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.dashboard-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.dashboard-modal-confirm-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboard-modal-confirm-btn:hover {
+  background-color: #c0392b;
+}
+
+.dashboard-modal-cancel-btn {
+  background-color: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboard-modal-cancel-btn:hover {
+  background-color: #7f8c8d;
+}
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
