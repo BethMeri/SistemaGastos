@@ -10,23 +10,11 @@ export default function Auth({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Función para evaluar la seguridad de la contraseña en tiempo real
-  const evaluarSeguridadPassword = (pass) => {
-    if (!pass) return { nivel: '', texto: '', porcentaje: '0%' };
-    
-    let puntuacion = 0;
-    if (pass.length >= 8) puntuacion++;
-    if (/[0-9]/.test(pass)) puntuacion++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(pass)) puntuacion++;
-
-    if (puntuacion === 1) return { nivel: 'debil', texto: 'Contraseña débil', porcentaje: '33%' };
-    if (puntuacion === 2) return { nivel: 'media', texto: 'Contraseña media', porcentaje: '66%' };
-    if (puntuacion === 3) return { nivel: 'fuerte', texto: 'Contraseña segura 🔒', porcentaje: '100%' };
-
-    return { nivel: 'debil', texto: 'Muy corta', porcentaje: '20%' };
-  };
-
-  const seguridad = evaluarSeguridadPassword(password);
+  // Validaciones en tiempo real para el registro
+  const tieneLongitud = password.length >= 8;
+  const tieneNumero = /[0-9]/.test(password);
+  const tieneMayuscula = /[A-Z]/.test(password);
+  const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,14 +25,16 @@ export default function Auth({ onLoginSuccess }) {
       return;
     }
 
-    // Si es registro, aplicamos la regla estricta de seguridad
-    if (!esLogin) {
-      const tieneNumero = /[0-9]/.test(password);
-      const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-      const esLargaSuficiente = password.length >= 8;
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexCorreo.test(correo)) {
+      setError("Por favor, ingresa un correo electrónico válido (ej. tu.correo@gmail.com).");
+      setSuccessMessage('');
+      return;
+    }
 
-      if (!esLargaSuficiente || !tieneNumero || !tieneEspecial) {
-        setError("La contraseña debe tener al menos 8 caracteres, incluir números y caracteres especiales (ej. @, $, !).");
+    if (!esLogin) {
+      if (!tieneLongitud || !tieneNumero || !tieneMayuscula || !tieneEspecial) {
+        setError("La contraseña no cumple con todos los requisitos de seguridad obligatorios.");
         setSuccessMessage('');
         return;
       }
@@ -89,7 +79,7 @@ export default function Auth({ onLoginSuccess }) {
           <div className="auth-input-group">
             <label>Correo electrónico</label>
             <input 
-              type="email" 
+              type="text" 
               placeholder="tu.correo@email.com" 
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
@@ -105,18 +95,24 @@ export default function Auth({ onLoginSuccess }) {
               onChange={(e) => setPassword(e.target.value)}
             />
             
-            {/* Barra de seguridad visual (solo aparece al registrarse o escribir) */}
-            {!esLogin && password && (
-              <div className="auth-strength-container">
-                <div className="auth-strength-bar-bg">
-                  <div 
-                    className={`auth-strength-bar-fill ${seguridad.nivel}`} 
-                    style={{ width: seguridad.porcentaje }}
-                  ></div>
-                </div>
-                <span className={`auth-strength-text ${seguridad.nivel}`}>
-                  {seguridad.texto}
-                </span>
+            {/* Checklist de requisitos de contraseña (solo aparece en modo Registro) */}
+            {!esLogin && (
+              <div className="auth-password-requirements">
+                <p className="requirements-title">La contraseña debe contener:</p>
+                <ul>
+                  <li className={tieneLongitud ? 'valid' : 'invalid'}>
+                    {tieneLongitud ? '✓' : '•'} Mínimo 8 caracteres
+                  </li>
+                  <li className={tieneMayuscula ? 'valid' : 'invalid'}>
+                    {tieneMayuscula ? '✓' : '•'} Al menos una letra mayúscula
+                  </li>
+                  <li className={tieneNumero ? 'valid' : 'invalid'}>
+                    {tieneNumero ? '✓' : '•'} Al menos un número
+                  </li>
+                  <li className={tieneEspecial ? 'valid' : 'invalid'}>
+                    {tieneEspecial ? '✓' : '•'} Al menos un carácter especial (ej. @, $, !)
+                  </li>
+                </ul>
               </div>
             )}
           </div>

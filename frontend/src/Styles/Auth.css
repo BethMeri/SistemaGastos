@@ -1,4 +1,5 @@
 /* frontend/src/Styles/Auth.css */
+
 .auth-container {
   display: flex;
   justify-content: center;
@@ -48,6 +49,19 @@
   text-align: center;
 }
 
+/* --- Alerta de Éxito --- */
+.auth-success-alert {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+  font-size: 13px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  text-align: center;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -78,6 +92,46 @@
 
 .auth-input-group input:focus {
   border-color: #27ae60;
+}
+
+/* --- Requisitos dinámicos de la contraseña --- */
+.auth-password-requirements {
+  margin-top: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.requirements-title {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  margin-top: 0;
+}
+
+.auth-password-requirements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-password-requirements li {
+  transition: color 0.2s ease;
+}
+
+.auth-password-requirements li.invalid {
+  color: #6c757d; /* Gris cuando aún no se cumple */
+}
+
+.auth-password-requirements li.valid {
+  color: #27ae60; /* Verde cuando ya se cumple con éxito */
+  font-weight: 600;
 }
 
 .auth-submit-btn {
@@ -129,17 +183,3 @@
     transform: translateY(0);
   }
 }
-
-/* --- Alerta de Éxito --- */
-.auth-success-alert {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 10px 15px;
-  border-radius: 6px;
-  border: 1px solid #c3e6cb;
-  font-size: 13px;
-  margin-bottom: 20px;
-  font-weight: 500;
-  text-align: center;
-}
-
