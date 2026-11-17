@@ -5,7 +5,7 @@
   margin: 40px auto;
   padding: 0 20px;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  color: #2c3e50;
+  color: var(--text-main);
   animation: fadeInProfile 0.3s ease-in-out;
 }
 
@@ -17,13 +17,13 @@
 .profile-content-header h1 {
   font-size: 24px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-main);
   margin: 0 0 5px 0;
 }
 
 .profile-content-header p {
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -51,11 +51,12 @@
 
 /* Tarjeta Única Centrada */
 .profile-single-card {
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 35px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 /* Sección del Avatar Interactivo */
@@ -64,7 +65,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 25px;
-  border-bottom: 1px solid #f1f3f5;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 20px;
 }
 
@@ -125,7 +126,7 @@
 
 .avatar-hint {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-muted);
   margin-top: 10px;
   text-align: center;
 }
@@ -147,7 +148,7 @@
 .form-field label {
   font-size: 12px;
   font-weight: 600;
-  color: #495057;
+  color: var(--text-muted);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -174,21 +175,21 @@
 }
 
 .input-locked {
-  background-color: #f8f9fa;
-  border: 1px solid #ced4da;
-  color: #6c757d;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
 }
 
 .input-editable {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border: 1px solid #27ae60;
-  color: #2c3e50;
+  color: var(--text-main);
   box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
 }
 
 .field-hint {
   font-size: 11px;
-  color: #adb5bd;
+  color: var(--text-muted);
 }
 
 /* Botones de acción */
@@ -198,8 +199,8 @@
 
 .btn-outline-custom {
   background: transparent;
-  border: 1px solid #ced4da;
-  color: #495057;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   padding: 11px 16px;
   border-radius: 6px;
   font-size: 14px;
@@ -210,7 +211,7 @@
 }
 
 .btn-outline-custom:hover {
-  background-color: #f8f9fa;
+  background-color: var(--input-bg);
   border-color: #27ae60;
   color: #27ae60;
 }
@@ -238,9 +239,9 @@
 }
 
 .btn-secondary-custom {
-  background-color: #e9ecef;
-  color: #495057;
-  border: none;
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
   padding: 11px 16px;
   border-radius: 6px;
   font-size: 14px;
@@ -251,7 +252,7 @@
 }
 
 .btn-secondary-custom:hover {
-  background-color: #dee2e6;
+  background-color: var(--border-color);
 }
 
 @keyframes fadeInProfile {

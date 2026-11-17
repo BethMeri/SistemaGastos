@@ -1,5 +1,5 @@
 /* frontend/src/Pages/Auth.jsx */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Styles/Auth.css';
 
 export default function Auth({ onLoginSuccess }) {
@@ -9,6 +9,26 @@ export default function Auth({ onLoginSuccess }) {
   const [nombre, setNombre] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Estado para el Modo Oscuro / Claro en el Login
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  // Sincronizar el tema con el documento y localStorage
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Validaciones en tiempo real para el registro
   const tieneLongitud = password.length >= 8;
@@ -55,6 +75,18 @@ export default function Auth({ onLoginSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        
+        {/* Botón flotante para cambiar de tema en el Login */}
+        <div className="auth-top-bar">
+          <button 
+            onClick={toggleTheme} 
+            className="auth-theme-toggle-btn"
+            title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
+
         <div className="auth-header">
           <h2>SistemaGastos 💸</h2>
           <p>{esLogin ? 'Inicia sesión en tu cuenta' : 'Crea una cuenta nueva'}</p>

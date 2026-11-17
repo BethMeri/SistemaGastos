@@ -1,96 +1,73 @@
-/* frontend/src/styles/Dashboard.css */
+/* frontend/src/Styles/Dashboard.css */
+
 .dashboard-container {
   max-width: 1000px;
   margin: 40px auto;
-  padding: 20px;
+  padding: 0 20px;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-header {
   margin-bottom: 25px;
-  border-bottom: 2px solid #dee2e6;
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 15px;
 }
 
 .dashboard-header h1 {
-  color: #2c3e50;
+  color: var(--text-main);
   margin: 0;
+  font-size: 24px;
 }
 
 .dashboard-header p {
-  color: #6c757d;
+  color: var(--text-muted);
   margin-top: 5px;
-}
-
-.card-resumen {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid #e74c3c;
-  margin-bottom: 30px;
-}
-
-.card-resumen h3 {
-  margin: 0 0 10px 0;
-  color: #7f8c8d;
   font-size: 14px;
 }
 
+/* Tarjeta de Resumen */
+.card-resumen {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid #27ae60;
+  margin-bottom: 25px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.card-resumen h3 {
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .monto-total {
-  font-size: 28px;
-  font-weight: bold;
-  color: #e74c3c;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
   margin: 0;
 }
 
-.tabla-container {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.tabla-gastos {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  margin-top: 15px;
-}
-
-.tabla-gastos th {
-  background: #f1f3f5;
-  color: #495057;
-  padding: 12px;
-  border-bottom: 2px solid #dee2e6;
-}
-
-.tabla-gastos td {
-  padding: 12px;
-  border-bottom: 1px solid #e9ecef;
-  color: #212529;
-}
-
-.monto-celda {
-  font-weight: bold;
-  color: #27ae60;
-}
-
-/* --- Formulario --- */
+/* Contenedor de Formulario */
 .form-container {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  margin-bottom: 25px;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .form-container h3 {
+  margin-top: 0;
   margin-bottom: 15px;
-  color: #2c3e50;
+  color: var(--text-main);
+  font-size: 18px;
 }
 
 .gasto-form {
@@ -101,207 +78,269 @@
 
 .gasto-form input, 
 .gasto-form select {
-  padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
   font-size: 14px;
   flex: 1;
   min-width: 150px;
+  outline: none;
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+/* Forzamos que las opciones de los select mantengan visibilidad */
+.gasto-form select option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  padding: 10px;
+}
+
+.gasto-form input:focus, 
+.gasto-form select:focus {
+  border-color: #27ae60;
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
 }
 
 .gasto-form button {
   background-color: #27ae60;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(39, 174, 96, 0.25);
 }
 
 .gasto-form button:hover {
   background-color: #219653;
+  transform: translateY(-1px);
 }
 
-/* --- Alertas y Errores --- */
-.error-message,
+.dashboard-btn-actualizar {
+  background-color: #f39c12 !important;
+  box-shadow: 0 2px 6px rgba(243, 156, 18, 0.25) !important;
+}
+
+.dashboard-btn-actualizar:hover {
+  background-color: #d68910 !important;
+}
+
+/* Alertas y Errores */
 .dashboard-error-alert {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 10px 15px;
-  border-radius: 6px;
-  border: 1px solid #f5c6cb;
+  background-color: #fef2f2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
   font-size: 13px;
   margin-bottom: 15px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* --- Cabecera de la Tabla y Filtros --- */
+/* Contenedor de la Tabla */
+.tabla-container {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Cabecera de la Tabla y Filtro Moderno */
 .dashboard-table-header-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
-.dashboard-filter-box {
+.table-title-group h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 18px;
+}
+
+.table-title-group p {
+  margin: 2px 0 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Caja del Filtro Moderno */
+.filter-box-modern {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
+  background-color: var(--input-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px 14px;
+  transition: all 0.25s ease;
+}
+
+.filter-box-modern:hover {
+  border-color: #27ae60;
+}
+
+.filter-box-modern:focus-within {
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+}
+
+.filter-icon {
+  font-size: 13px;
+  margin-right: 8px;
+  opacity: 0.7;
 }
 
 .dashboard-filter-dropdown {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  border: none;
+  background: transparent;
   font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
   outline: none;
   cursor: pointer;
-  transition: border-color 0.2s;
+  padding: 6px 2px;
 }
 
-.dashboard-filter-dropdown:focus {
-  border-color: #27ae60;
+/* Estilo para las opciones del desplegable del filtro */
+.dashboard-filter-dropdown option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  padding: 8px;
+}
+
+/* Estilos de la Tabla */
+.tabla-gastos {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  margin-top: 5px;
+}
+
+.tabla-gastos th {
+  background: var(--table-th-bg);
+  color: var(--text-muted);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabla-gastos td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--table-tr-border);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.tabla-gastos th:last-child,
+.tabla-gastos td:last-child {
+  text-align: center;
+  width: 160px;
+}
+
+.monto-celda {
+  font-weight: 700;
+  color: #27ae60;
 }
 
 .dashboard-table-empty-row {
   text-align: center;
-  color: #7f8c8d;
-  padding: 20px !important;
+  color: var(--text-muted);
+  padding: 30px !important;
   font-style: italic;
 }
 
-/* --- Acciones de la Tabla (Botones y Confirmación) --- */
+/* Botones de Acciones en Tabla */
 .dashboard-acciones-celda {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  min-height: 32px;
+  justify-content: center;
 }
 
 .dashboard-action-edit-btn {
-  background-color: #f39c12;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1.5px solid #fde68a;
+  padding: 6px 12px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .dashboard-action-edit-btn:hover {
-  background-color: #d68910;
+  background-color: #f59e0b;
+  color: white;
+  border-color: #f59e0b;
 }
 
 .dashboard-action-delete-btn {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1.5px solid #fecaca;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .dashboard-action-delete-btn:hover {
-  background-color: #c0392b;
-}
-
-/* --- Caja de Confirmación de Borrado (Tamaño mejorado y cómodo) --- */
-.dashboard-confirm-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #fdf2f2;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #f5c6cb;
-}
-
-.dashboard-confirm-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: #c0392b;
-  white-space: nowrap;
-}
-
-.dashboard-action-yes-btn {
-  background-color: #e74c3c;
+  background-color: #dc2626;
   color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
+  border-color: #dc2626;
 }
 
-.dashboard-action-yes-btn:hover {
-  background-color: #c0392b;
-}
-
-.dashboard-action-no-btn {
-  background-color: #95a5a6;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.dashboard-action-no-btn:hover {
-  background-color: #7f8c8d;
-}
-
-/* --- Estilos para la Pantallita Modal de Confirmación --- */
+/* Pantallita Modal */
 .dashboard-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  animation: dashboardFadeIn 0.2s ease-in-out;
 }
 
 .dashboard-modal-card {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 380px;
   text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 .dashboard-modal-card h3 {
   margin-top: 0;
-  color: #2c3e50;
+  color: var(--text-main);
   font-size: 20px;
   margin-bottom: 10px;
 }
 
 .dashboard-modal-card p {
-  color: #6c757d;
+  color: var(--text-muted);
   font-size: 14px;
   margin-bottom: 25px;
   line-height: 1.5;
@@ -314,42 +353,34 @@
 }
 
 .dashboard-modal-confirm-btn {
-  background-color: #e74c3c;
+  background-color: #dc2626;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .dashboard-modal-confirm-btn:hover {
-  background-color: #c0392b;
+  background-color: #b91c1c;
 }
 
 .dashboard-modal-cancel-btn {
-  background-color: #95a5a6;
-  color: white;
-  border: none;
+  background-color: var(--input-bg);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-color);
   padding: 10px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .dashboard-modal-cancel-btn:hover {
-  background-color: #7f8c8d;
-}
-
-@keyframes dashboardFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  background-color: var(--border-color);
+  color: var(--text-main);
 }

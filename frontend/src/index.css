@@ -1,0 +1,42 @@
+/* frontend/src/index.css */
+
+/* --- PALETA DE VARIABLES --- */
+:root {
+  /* Modo Claro (Predeterminado) */
+  --bg-body: #f4f7f6;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --input-bg: #f8fafc;
+  --navbar-bg: rgba(255, 255, 255, 0.9);
+  --tab-bg: #f1f5f9;
+  --table-th-bg: #f8fafc;
+  --table-tr-border: #f1f5f9;
+}
+
+[data-theme="dark"] {
+  /* Modo Oscuro (Preparado para cuando lo activemos) */
+  --bg-body: #0b0f19;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --input-bg: #0f172a;
+  --navbar-bg: rgba(30, 41, 59, 0.9);
+  --tab-bg: #0f172a;
+  --table-th-bg: #0f172a;
+  --table-tr-border: #334155;
+}
+
+html {
+  scrollbar-gutter: stable; /* Evita el salto de la pantalla al cambiar de página */
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

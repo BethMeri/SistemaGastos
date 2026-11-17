@@ -146,13 +146,13 @@ export default function Dashboard() {
             onChange={(e) => setMonto(e.target.value)}
           />
           <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-            <option value="Alimentos">Alimentos</option>
-            <option value="Servicios">Servicios</option>
-            <option value="Suscripciones">Suscripciones</option>
-            <option value="Transporte">Transporte</option>
-            <option value="Entretenimiento">Entretenimiento</option>
-            <option value="Tecnología">Tecnología</option>
-            <option value="Hogar">Hogar</option>
+            <option value="Alimentos">🍔 Alimentos</option>
+            <option value="Servicios">💡 Servicios</option>
+            <option value="Suscripciones">⚡ Suscripciones</option>
+            <option value="Transporte">🚗 Transporte</option>
+            <option value="Entretenimiento">🎮 Entretenimiento</option>
+            <option value="Tecnología">💻 Tecnología</option>
+            <option value="Hogar">🏠 Hogar</option>
           </select>
           <button type="submit" className={idEditando !== null ? 'dashboard-btn-actualizar' : ''}>
             {idEditando !== null ? 'Actualizar' : 'Agregar'}
@@ -160,27 +160,29 @@ export default function Dashboard() {
         </form>
       </div>
 
-      {/* Tabla de registros recientes con Filtro por Categoría */}
+      {/* Tabla de registros recientes con el nuevo Filtro Moderno */}
       <div className="tabla-container">
         <div className="dashboard-table-header-box">
-          <h3>Gastos Recientes</h3>
+          <div className="table-title-group">
+            <h3>Gastos Recientes</h3>
+            <p>Historial detallado de tus movimientos</p>
+          </div>
           
-          <div className="dashboard-filter-box">
-            <label htmlFor="filtro-cat">Filtrar:</label>
+          <div className="filter-box-modern">
+            <span className="filter-icon">🔍</span>
             <select 
-              id="filtro-cat"
               className="dashboard-filter-dropdown"
               value={categoriaFiltro} 
               onChange={(e) => setCategoriaFiltro(e.target.value)}
             >
               <option value="Todas">Todas las categorías</option>
-              <option value="Alimentos">Alimentos</option>
-              <option value="Servicios">Servicios</option>
-              <option value="Suscripciones">Suscripciones</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Entretenimiento">Entretenimiento</option>
-              <option value="Tecnología">Tecnología</option>
-              <option value="Hogar">Hogar</option>
+              <option value="Alimentos">🍔 Alimentos</option>
+              <option value="Servicios">💡 Servicios</option>
+              <option value="Suscripciones">⚡ Suscripciones</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Entretenimiento">🎮 Entretenimiento</option>
+              <option value="Tecnología">💻 Tecnología</option>
+              <option value="Hogar">🏠 Hogar</option>
             </select>
           </div>
         </div>

@@ -1,9 +1,10 @@
 /* frontend/src/App.jsx */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './Pages/Auth';
 import Dashboard from './Pages/Dashboard';
 import Profile from './Pages/Profile';
+import Layout from './Components/Layout';
 
 export default function App() {
   // Verificamos si el usuario ya estaba autenticado en la memoria del navegador
@@ -11,21 +12,15 @@ export default function App() {
     return localStorage.getItem('isAutenticado') === 'true';
   });
 
-  // Cada vez que cambie el estado, lo guardamos en localStorage
   const handleLoginSuccess = () => {
     localStorage.setItem('isAutenticado', 'true');
     setAutenticado(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAutenticado');
-    setAutenticado(false);
-  };
-
   return (
     <Router>
       <Routes>
-        {/* Ruta de Autenticación */}
+        {/* Ruta de Autenticación / Login */}
         <Route 
           path="/login" 
           element={
@@ -37,29 +32,19 @@ export default function App() {
           } 
         />
 
-        {/* Ruta del Dashboard Principal */}
+        {/* Rutas Protegidas envueltas en el Layout (Incluyen la Navbar automáticamente) */}
         <Route 
-          path="/dashboard" 
           element={
             autenticado ? (
-              <Dashboard onLogout={handleLogout} />
+              <Layout />
             ) : (
               <Navigate to="/login" replace />
             )
-          } 
-        />
-
-        {/* Ruta de Perfil de Usuario */}
-        <Route 
-          path="/perfil" 
-          element={
-            autenticado ? (
-              <Profile />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          } 
-        />
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/perfil" element={<Profile />} />
+        </Route>
 
         {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to="/login" replace />} />
