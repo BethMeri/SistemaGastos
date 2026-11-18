@@ -60,6 +60,15 @@ export default function Navbar() {
           >
             <span>📊</span> Dashboard
           </Link>
+          
+          {/* 👇 ¡Aquí está integrada la nueva pestaña de Estadísticas! */}
+          <Link 
+            to="/estadisticas" 
+            className={`nav-tab-item ${location.pathname === '/estadisticas' ? 'active' : ''}`}
+          >
+            <span>📈</span> Estadísticas
+          </Link>
+
           <Link 
             to="/perfil" 
             className={`nav-tab-item ${location.pathname === '/perfil' ? 'active' : ''}`}

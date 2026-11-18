@@ -5,6 +5,7 @@ import Auth from './Pages/Auth';
 import Dashboard from './Pages/Dashboard';
 import Profile from './Pages/Profile';
 import Layout from './Components/Layout';
+import Statistics from './Pages/Statistics';
 
 export default function App() {
   // Verificamos si el usuario ya estaba autenticado en la memoria del navegador
@@ -44,6 +45,7 @@ export default function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/perfil" element={<Profile />} />
+          <Route path="/estadisticas" element={<Statistics />} />
         </Route>
 
         {/* Redirección por defecto */}
