@@ -90,7 +90,16 @@
   transition: all 0.2s;
 }
 
-/* Forzamos que las opciones de los select mantengan visibilidad */
+/* Quitar flechitas del input de número */
+.gasto-form input[type="number"]::-webkit-outer-spin-button,
+.gasto-form input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.gasto-form input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .gasto-form select option {
   background-color: var(--bg-card);
   color: var(--text-main);
@@ -152,7 +161,7 @@
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* Cabecera de la Tabla y Filtro Moderno */
+/* Cabecera de la Tabla y Grupo de Filtros Modernos */
 .dashboard-table-header-box {
   display: flex;
   justify-content: space-between;
@@ -172,6 +181,13 @@
   margin: 2px 0 0 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* Contenedor para múltiples filtros */
+.dashboard-filters-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* Caja del Filtro Moderno */
@@ -211,7 +227,6 @@
   padding: 6px 2px;
 }
 
-/* Estilo para las opciones del desplegable del filtro */
 .dashboard-filter-dropdown option {
   background-color: var(--bg-card);
   color: var(--text-main);
@@ -383,4 +398,27 @@
 .dashboard-modal-cancel-btn:hover {
   background-color: var(--border-color);
   color: var(--text-main);
+}
+
+/* frontend/src/Styles/Dashboard.css */
+
+.dashboard-export-btn {
+  background-color: var(--input-bg);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.dashboard-export-btn:hover {
+  border-color: #27ae60;
+  background-color: rgba(39, 174, 96, 0.08);
+  transform: translateY(-1px);
 }

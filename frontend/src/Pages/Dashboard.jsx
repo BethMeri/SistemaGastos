@@ -1,9 +1,9 @@
 /* frontend/src/Pages/Dashboard.jsx */
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 import '../Styles/Dashboard.css';
 
 export default function Dashboard() {
-  // Inicializamos el estado cargando desde localStorage (si existe) o con datos por defecto
   const [gastos, setGastos] = useState(() => {
     const gastosGuardados = localStorage.getItem('sistema_gastos');
     if (gastosGuardados) {
@@ -24,11 +24,16 @@ export default function Dashboard() {
   const [monto, setMonto] = useState('');
   const [categoria, setCategoria] = useState('Alimentos');
   const [error, setError] = useState('');
+  
+  // Estados para los filtros (Iniciamos en el mes actual del sistema por defecto)
   const [categoriaFiltro, setCategoriaFiltro] = useState('Todas');
+  const [mesFiltro, setMesFiltro] = useState(() => {
+    return new Date().toISOString().slice(0, 7);
+  });
+
   const [idEditando, setIdEditando] = useState(null);
   const [idConfirmando, setIdConfirmando] = useState(null);
 
-  // Cada vez que el arreglo 'gastos' cambie, lo guardamos automáticamente en localStorage
   useEffect(() => {
     localStorage.setItem('sistema_gastos', JSON.stringify(gastos));
   }, [gastos]);
@@ -106,9 +111,89 @@ export default function Dashboard() {
     setError('');
   };
 
-  const gastosMostrados = categoriaFiltro === 'Todas' 
-    ? gastos 
-    : gastos.filter((gasto) => gasto.categoria === categoriaFiltro);
+  // Función para transformar "2026-11-18" a "18/11/2026"
+  const formatearFechaVisual = (fechaStr) => {
+    if (!fechaStr) return '';
+    const [anio, mes, dia] = fechaStr.split('-');
+    return `${dia}/${mes}/${anio}`;
+  };
+
+  // Obtener meses únicos presentes en los gastos (ej. "2026-11")
+  const mesesDisponibles = [...new Set(gastos.map((gasto) => gasto.fecha.slice(0, 7)))].sort().reverse();
+
+  // Función para formatear "2026-11" a "noviembre de 2026"
+  const formatearMesNombre = (anioMes) => {
+    if (!anioMes) return '';
+    const [anio, mes] = anioMes.split('-');
+    const fecha = new Date(parseInt(anio), parseInt(mes) - 1, 1);
+    return fecha.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+  };
+
+  // Filtrar gastos por categoría y por mes simultáneamente
+  const gastosMostrados = gastos.filter((gasto) => {
+    const coincideCategoria = categoriaFiltro === 'Todas' || gasto.categoria === categoriaFiltro;
+    const coincideMes = mesFiltro === 'Todos' || gasto.fecha.startsWith(mesFiltro);
+    return coincideCategoria && coincideMes;
+  });
+
+  // Función para exportar un archivo de Excel (.xlsx) con nombre dinámico elegante
+  const exportarExcel = () => {
+    if (gastosMostrados.length === 0) {
+      alert("No hay gastos para exportar con los filtros actuales.");
+      return;
+    }
+
+    const aoa = [
+      ["Concepto", "Categoría", "Fecha", "Monto ($)"]
+    ];
+
+    gastosMostrados.forEach((gasto) => {
+      aoa.push([
+        gasto.concepto,
+        gasto.categoria,
+        formatearFechaVisual(gasto.fecha),
+        Number(gasto.monto)
+      ]);
+    });
+
+    const filaInicio = 2;
+    const filaFin = filaInicio + gastosMostrados.length - 1;
+    aoa.push(["TOTAL GASTADO", "", "", { f: `SUM(D${filaInicio}:D${filaFin})` }]);
+
+    const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+    // Activamos los filtros automáticos desplegables en Excel
+    const rangoDatos = XLSX.utils.encode_range({
+      s: { r: 0, c: 0 },
+      e: { r: gastosMostrados.length, c: 3 }
+    });
+    worksheet['!autofilter'] = { ref: rangoDatos };
+
+    worksheet['!cols'] = [
+      { wch: 30 }, 
+      { wch: 22 }, 
+      { wch: 16 }, 
+      { wch: 18 }  
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte Gastos");
+
+    // Construcción del nombre de archivo profesional y limpio
+    let nombreArchivo = "";
+    if (mesFiltro === 'Todos') {
+      const anioActual = new Date().getFullYear();
+      nombreArchivo = `SistemaGastos_${anioActual}.xlsx`;
+    } else {
+      const [anio, mes] = mesFiltro.split('-');
+      const fecha = new Date(parseInt(anio), parseInt(mes) - 1, 1);
+      const nombreMes = fecha.toLocaleString('es-ES', { month: 'long' });
+      const nombreMesCapitalizado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+      nombreArchivo = `SistemaGastos_${nombreMesCapitalizado}_${anio}.xlsx`;
+    }
+
+    XLSX.writeFile(workbook, nombreArchivo);
+  };
 
   const totalGastos = gastos.reduce((acc, item) => acc + item.monto, 0);
 
@@ -153,6 +238,7 @@ export default function Dashboard() {
             <option value="Entretenimiento">🎮 Entretenimiento</option>
             <option value="Tecnología">💻 Tecnología</option>
             <option value="Hogar">🏠 Hogar</option>
+            <option value="Otros">📦 Otros</option>
           </select>
           <button type="submit" className={idEditando !== null ? 'dashboard-btn-actualizar' : ''}>
             {idEditando !== null ? 'Actualizar' : 'Agregar'}
@@ -160,7 +246,7 @@ export default function Dashboard() {
         </form>
       </div>
 
-      {/* Tabla de registros recientes con el nuevo Filtro Moderno */}
+      {/* Tabla de registros recientes */}
       <div className="tabla-container">
         <div className="dashboard-table-header-box">
           <div className="table-title-group">
@@ -168,22 +254,52 @@ export default function Dashboard() {
             <p>Historial detallado de tus movimientos</p>
           </div>
           
-          <div className="filter-box-modern">
-            <span className="filter-icon">🔍</span>
-            <select 
-              className="dashboard-filter-dropdown"
-              value={categoriaFiltro} 
-              onChange={(e) => setCategoriaFiltro(e.target.value)}
+          <div className="dashboard-filters-group">
+            {/* Filtro por Mes */}
+            <div className="filter-box-modern">
+              <span className="filter-icon">📅</span>
+              <select 
+                className="dashboard-filter-dropdown"
+                value={mesFiltro} 
+                onChange={(e) => setMesFiltro(e.target.value)}
+              >
+                <option value="Todos">Todos los meses</option>
+                {mesesDisponibles.map((mes) => (
+                  <option key={mes} value={mes}>
+                    {formatearMesNombre(mes)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filtro por Categoría */}
+            <div className="filter-box-modern">
+              <span className="filter-icon">🔍</span>
+              <select 
+                className="dashboard-filter-dropdown"
+                value={categoriaFiltro} 
+                onChange={(e) => setCategoriaFiltro(e.target.value)}
+              >
+                <option value="Todas">Todas las categorías</option>
+                <option value="Alimentos">🍔 Alimentos</option>
+                <option value="Servicios">💡 Servicios</option>
+                <option value="Suscripciones">⚡ Suscripciones</option>
+                <option value="Transporte">🚗 Transporte</option>
+                <option value="Entretenimiento">🎮 Entretenimiento</option>
+                <option value="Tecnología">💻 Tecnología</option>
+                <option value="Hogar">🏠 Hogar</option>
+                <option value="Otros">📦 Otros</option>
+              </select>
+            </div>
+
+            {/* Botón de Exportar a Excel Pro */}
+            <button 
+              onClick={exportarExcel} 
+              className="dashboard-export-btn"
+              title="Descargar reporte profesional en formato Excel (.xlsx)"
             >
-              <option value="Todas">Todas las categorías</option>
-              <option value="Alimentos">🍔 Alimentos</option>
-              <option value="Servicios">💡 Servicios</option>
-              <option value="Suscripciones">⚡ Suscripciones</option>
-              <option value="Transporte">🚗 Transporte</option>
-              <option value="Entretenimiento">🎮 Entretenimiento</option>
-              <option value="Tecnología">💻 Tecnología</option>
-              <option value="Hogar">🏠 Hogar</option>
-            </select>
+              <span>📊</span> Exportar Excel Pro
+            </button>
           </div>
         </div>
 
@@ -203,7 +319,7 @@ export default function Dashboard() {
                 <tr key={gasto.id}>
                   <td>{gasto.concepto}</td>
                   <td>{gasto.categoria}</td>
-                  <td>{gasto.fecha}</td>
+                  <td>{formatearFechaVisual(gasto.fecha)}</td>
                   <td className="monto-celda">${gasto.monto.toFixed(2)}</td>
                   <td>
                     <div className="dashboard-acciones-celda">
@@ -226,7 +342,7 @@ export default function Dashboard() {
             ) : (
               <tr>
                 <td colSpan="5" className="dashboard-table-empty-row">
-                  No hay gastos registrados en esta categoría.
+                  No hay gastos registrados con estos filtros.
                 </td>
               </tr>
             )}

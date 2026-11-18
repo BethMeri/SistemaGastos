@@ -109,7 +109,7 @@ export default function Profile() {
           </div>
 
           <div className="form-field">
-            <label>Correo electrónico <span className="badge-verified">Principal</span></label>
+            <label>Correo electrónico</label>
             <input 
               type="email" 
               value={correo} 
