@@ -1,6 +1,7 @@
 /* frontend/src/Pages/Dashboard.jsx */
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { parsearGastoInteligente } from '../utils/smartParser';
 import '../Styles/Dashboard.css';
 
 export default function Dashboard() {
@@ -25,6 +26,10 @@ export default function Dashboard() {
   const [categoria, setCategoria] = useState('Alimentos');
   const [error, setError] = useState('');
   
+  // Estado para el Smart Parser (IA)
+  const [fraseIa, setFraseIa] = useState('');
+  const [mensajeIaExito, setMensajeIaExito] = useState('');
+
   // Estados para los filtros (Iniciamos en el mes actual del sistema por defecto)
   const [categoriaFiltro, setCategoriaFiltro] = useState('Todas');
   const [mesFiltro, setMesFiltro] = useState(() => {
@@ -37,6 +42,37 @@ export default function Dashboard() {
   useEffect(() => {
     localStorage.setItem('sistema_gastos', JSON.stringify(gastos));
   }, [gastos]);
+
+  // Manejador del Registro Inteligente por Lenguaje Natural (Smart Parser AI)
+  const handleSmartSubmit = (e) => {
+    e.preventDefault();
+    if (!fraseIa.trim()) return;
+
+    const gastoExtraido = parsearGastoInteligente(fraseIa);
+
+    if (gastoExtraido.monto <= 0) {
+      setError("La IA no pudo detectar un monto válido. Prueba escribiendo ej: 'Gasté 15 en almuerzo'");
+      return;
+    }
+
+    setError('');
+    
+    const nuevoGasto = {
+      id: Date.now(),
+      concepto: gastoExtraido.descripcion,
+      monto: gastoExtraido.monto,
+      categoria: gastoExtraido.categoria,
+      fecha: gastoExtraido.fecha
+    };
+
+    setGastos([nuevoGasto, ...gastos]);
+    setMensajeIaExito(`✨ ¡IA detectó con éxito! (${gastoExtraido.categoria} - $${gastoExtraido.monto})`);
+    setFraseIa('');
+
+    setTimeout(() => {
+      setMensajeIaExito('');
+    }, 4000);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -111,17 +147,14 @@ export default function Dashboard() {
     setError('');
   };
 
-  // Función para transformar "2026-11-18" a "18/11/2026"
   const formatearFechaVisual = (fechaStr) => {
     if (!fechaStr) return '';
     const [anio, mes, dia] = fechaStr.split('-');
     return `${dia}/${mes}/${anio}`;
   };
 
-  // Obtener meses únicos presentes en los gastos (ej. "2026-11")
   const mesesDisponibles = [...new Set(gastos.map((gasto) => gasto.fecha.slice(0, 7)))].sort().reverse();
 
-  // Función para formatear "2026-11" a "noviembre de 2026"
   const formatearMesNombre = (anioMes) => {
     if (!anioMes) return '';
     const [anio, mes] = anioMes.split('-');
@@ -129,14 +162,12 @@ export default function Dashboard() {
     return fecha.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
   };
 
-  // Filtrar gastos por categoría y por mes simultáneamente
   const gastosMostrados = gastos.filter((gasto) => {
     const coincideCategoria = categoriaFiltro === 'Todas' || gasto.categoria === categoriaFiltro;
     const coincideMes = mesFiltro === 'Todos' || gasto.fecha.startsWith(mesFiltro);
     return coincideCategoria && coincideMes;
   });
 
-  // Función para exportar un archivo de Excel (.xlsx) con nombre dinámico elegante
   const exportarExcel = () => {
     if (gastosMostrados.length === 0) {
       alert("No hay gastos para exportar con los filtros actuales.");
@@ -162,7 +193,6 @@ export default function Dashboard() {
 
     const worksheet = XLSX.utils.aoa_to_sheet(aoa);
 
-    // Activamos los filtros automáticos desplegables en Excel
     const rangoDatos = XLSX.utils.encode_range({
       s: { r: 0, c: 0 },
       e: { r: gastosMostrados.length, c: 3 }
@@ -179,7 +209,6 @@ export default function Dashboard() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte Gastos");
 
-    // Construcción del nombre de archivo profesional y limpio
     let nombreArchivo = "";
     if (mesFiltro === 'Todos') {
       const anioActual = new Date().getFullYear();
@@ -210,7 +239,34 @@ export default function Dashboard() {
         <p className="monto-total">${totalGastos.toFixed(2)}</p>
       </div>
 
-      {/* Formulario para registrar o editar un gasto */}
+      {/* 🤖 Tarjeta de Entrada Rápida con Smart Parser (AI) */}
+      <div className="smart-parser-card">
+        <div className="smart-parser-header">
+          <h3>✨ Registro Inteligente (Smart Parser AI)</h3>
+          <p>Escribe tu gasto en lenguaje natural y deja que la IA extraiga los datos por ti.</p>
+        </div>
+
+        {mensajeIaExito && (
+          <div className="smart-parser-success">
+            {mensajeIaExito}
+          </div>
+        )}
+
+        <form onSubmit={handleSmartSubmit} className="gasto-form">
+          <input 
+            type="text" 
+            placeholder="Ej: Gasté 15 en almuerzo ayer, Uber 8.50..." 
+            value={fraseIa}
+            onChange={(e) => setFraseIa(e.target.value)}
+            className="smart-parser-input"
+          />
+          <button type="submit" className="smart-parser-btn">
+            Procesar con IA 🧠
+          </button>
+        </form>
+      </div>
+
+      {/* Formulario tradicional para registrar o editar un gasto */}
       <div className="form-container">
         <h3>{idEditando !== null ? 'Editar Gasto' : 'Registrar Nuevo Gasto'}</h3>
 
@@ -298,7 +354,7 @@ export default function Dashboard() {
               className="dashboard-export-btn"
               title="Descargar reporte profesional en formato Excel (.xlsx)"
             >
-              <span>📊</span> Exportar Excel Pro
+              <span>📊</span> Exportar Excel
             </button>
           </div>
         </div>
