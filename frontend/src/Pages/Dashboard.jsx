@@ -44,6 +44,7 @@ export default function Dashboard() {
   }, [gastos]);
 
   // Manejador del Registro Inteligente por Lenguaje Natural (Smart Parser AI)
+  
   const handleSmartSubmit = (e) => {
     e.preventDefault();
     if (!fraseIa.trim()) return;
