@@ -182,22 +182,24 @@ const Statistics = () => {
           </div>
 
           <div className="budget-controls-right">
-            <form onSubmit={handleGuardarTotal} className="budget-global-form">
-              <div className="budget-input-group">
-                <span>$</span>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={inputTotal}
-                  onChange={(e) => setInputTotal(e.target.value)}
-                  placeholder="1000"
-                />
-              </div>
-              <button type="submit" className="budget-save-btn">
-                Guardar Total
-              </button>
-            </form>
+            {!editandoReparto && (
+              <form onSubmit={handleGuardarTotal} className="budget-global-form">
+                <div className="budget-input-group">
+                  <span>$</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={inputTotal}
+                    onChange={(e) => setInputTotal(e.target.value)}
+                    placeholder="1000"
+                  />
+                </div>
+                <button type="submit" className="budget-save-btn">
+                  Guardar Total
+                </button>
+              </form>
+            )}
 
             <button
               type="button"
@@ -334,11 +336,12 @@ const Statistics = () => {
             >
               <span>🤖</span>
               <span>
-                <strong>Proyección IA:</strong> Gastando ~${analisis.promedioDiario.toFixed(2)}/día, cerrarías el mes
-                en <strong>~${analisis.proyectadoFinMes.toFixed(2)}</strong>
+                <strong>Proyección IA:</strong> A tu ritmo promedio actual (~$
+                {analisis.promedioDiario.toFixed(2)}/día), cerrarías el mes en{' '}
+                <strong>~${analisis.proyectadoFinMes.toFixed(2)}</strong>
                 {analisis.proyectadoFinMes > analisis.presupuestoTotal
-                  ? ', por encima de tu presupuesto mensual.'
-                  : ', dentro de tu presupuesto mensual.'}
+                  ? `, por encima de tu presupuesto de $${analisis.presupuestoTotal.toFixed(2)}.`
+                  : `, dentro de tu presupuesto de $${analisis.presupuestoTotal.toFixed(2)}.`}
               </span>
             </div>
           )}
@@ -367,11 +370,15 @@ const Statistics = () => {
                   </span>
                   <div className="cat-metrics">
                     <span className="cat-amount">
-                      <strong>${cat.gastado.toFixed(2)}</strong> / ${cat.asignado.toFixed(2)} asignados (
-                      {cat.porcentajeDeBolsa.toFixed(0)}% del total)
+                      <strong>${cat.gastado.toFixed(2)}</strong> / ${cat.asignado.toFixed(2)} asignados ·{' '}
+                      {cat.disponibleCat >= 0
+                        ? `Quedan $${cat.disponibleCat.toFixed(2)}`
+                        : `Excedido por $${Math.abs(cat.disponibleCat).toFixed(2)}`}
                     </span>
                     <span className={`cat-pill pill-${cat.estado}`}>
-                      {cat.porcentajeUso.toFixed(0)}%
+                      {cat.porcentajeUso > 99 && cat.porcentajeUso < 100
+                        ? `${cat.porcentajeUso.toFixed(1)}%`
+                        : `${cat.porcentajeUso.toFixed(0)}%`}
                     </span>
                   </div>
                 </div>

@@ -4,12 +4,26 @@ import * as XLSX from 'xlsx';
 import { parsearGastoInteligente } from '../utils/smartParser';
 import '../Styles/Dashboard.css';
 
+const normalizarCategoria = (cat) => {
+  if (!cat) return 'Otros';
+  if (cat.trim().toLowerCase() === 'alimentación' || cat.trim().toLowerCase() === 'alimentacion') {
+    return 'Alimentos';
+  }
+  return cat;
+};
+
 export default function Dashboard() {
   const [gastos, setGastos] = useState(() => {
     const gastosGuardados = localStorage.getItem('sistema_gastos');
     if (gastosGuardados) {
       try {
-        return JSON.parse(gastosGuardados);
+        const parsed = JSON.parse(gastosGuardados);
+        if (Array.isArray(parsed)) {
+          return parsed.map((g) => ({
+            ...g,
+            categoria: normalizarCategoria(g.categoria)
+          }));
+        }
       } catch (error) {
         console.error("Error al leer localStorage:", error);
       }
@@ -25,7 +39,7 @@ export default function Dashboard() {
   const [monto, setMonto] = useState('');
   const [categoria, setCategoria] = useState('Alimentos');
   const [error, setError] = useState('');
-  
+
   // Estado para el Smart Parser (IA)
   const [fraseIa, setFraseIa] = useState('');
   const [mensajeIaExito, setMensajeIaExito] = useState('');
@@ -44,7 +58,6 @@ export default function Dashboard() {
   }, [gastos]);
 
   // Manejador del Registro Inteligente por Lenguaje Natural (Smart Parser AI)
-  
   const handleSmartSubmit = (e) => {
     e.preventDefault();
     if (!fraseIa.trim()) return;
@@ -57,17 +70,18 @@ export default function Dashboard() {
     }
 
     setError('');
-    
+    const categoriaLimpia = normalizarCategoria(gastoExtraido.categoria);
+
     const nuevoGasto = {
       id: Date.now(),
       concepto: gastoExtraido.descripcion,
       monto: gastoExtraido.monto,
-      categoria: gastoExtraido.categoria,
+      categoria: categoriaLimpia,
       fecha: gastoExtraido.fecha
     };
 
     setGastos([nuevoGasto, ...gastos]);
-    setMensajeIaExito(`✨ ¡IA detectó con éxito! (${gastoExtraido.categoria} - $${gastoExtraido.monto})`);
+    setMensajeIaExito(`✨ ¡IA detectó con éxito! (${categoriaLimpia} - $${gastoExtraido.monto})`);
     setFraseIa('');
 
     setTimeout(() => {
@@ -77,7 +91,7 @@ export default function Dashboard() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const conceptoInvalido = !concepto || concepto.trim().length < 3;
     const montoInvalido = !monto || parseFloat(monto) <= 0;
 
@@ -95,6 +109,7 @@ export default function Dashboard() {
     }
 
     setError('');
+    const categoriaLimpia = normalizarCategoria(categoria);
 
     if (idEditando !== null) {
       const gastosActualizados = gastos.map((gasto) => {
@@ -103,7 +118,7 @@ export default function Dashboard() {
             ...gasto,
             concepto: concepto.trim(),
             monto: parseFloat(monto),
-            categoria: categoria
+            categoria: categoriaLimpia
           };
         }
         return gasto;
@@ -116,7 +131,7 @@ export default function Dashboard() {
         id: Date.now(),
         concepto: concepto.trim(),
         monto: parseFloat(monto),
-        categoria: categoria,
+        categoria: categoriaLimpia,
         fecha: new Date().toISOString().split('T')[0]
       };
 
@@ -132,7 +147,7 @@ export default function Dashboard() {
     const gastosFiltrados = gastos.filter((gasto) => gasto.id !== id);
     setGastos(gastosFiltrados);
     setIdConfirmando(null);
-    
+
     if (idEditando === id) {
       setIdEditando(null);
       setConcepto('');
@@ -144,7 +159,7 @@ export default function Dashboard() {
     setIdEditando(gasto.id);
     setConcepto(gasto.concepto);
     setMonto(gasto.monto);
-    setCategoria(gasto.categoria);
+    setCategoria(normalizarCategoria(gasto.categoria));
     setError('');
   };
 
@@ -159,12 +174,14 @@ export default function Dashboard() {
   const formatearMesNombre = (anioMes) => {
     if (!anioMes) return '';
     const [anio, mes] = anioMes.split('-');
-    const fecha = new Date(parseInt(anio), parseInt(mes) - 1, 1);
-    return fecha.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+    const fecha = new Date(parseInt(anio, 10), parseInt(mes, 10) - 1, 1);
+    const texto = fecha.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
   };
 
   const gastosMostrados = gastos.filter((gasto) => {
-    const coincideCategoria = categoriaFiltro === 'Todas' || gasto.categoria === categoriaFiltro;
+    const catGasto = normalizarCategoria(gasto.categoria);
+    const coincideCategoria = categoriaFiltro === 'Todas' || catGasto === categoriaFiltro;
     const coincideMes = mesFiltro === 'Todos' || gasto.fecha.startsWith(mesFiltro);
     return coincideCategoria && coincideMes;
   });
@@ -182,7 +199,7 @@ export default function Dashboard() {
     gastosMostrados.forEach((gasto) => {
       aoa.push([
         gasto.concepto,
-        gasto.categoria,
+        normalizarCategoria(gasto.categoria),
         formatearFechaVisual(gasto.fecha),
         Number(gasto.monto)
       ]);
@@ -201,10 +218,10 @@ export default function Dashboard() {
     worksheet['!autofilter'] = { ref: rangoDatos };
 
     worksheet['!cols'] = [
-      { wch: 30 }, 
-      { wch: 22 }, 
-      { wch: 16 }, 
-      { wch: 18 }  
+      { wch: 30 },
+      { wch: 22 },
+      { wch: 16 },
+      { wch: 18 }
     ];
 
     const workbook = XLSX.utils.book_new();
@@ -216,7 +233,7 @@ export default function Dashboard() {
       nombreArchivo = `SistemaGastos_${anioActual}.xlsx`;
     } else {
       const [anio, mes] = mesFiltro.split('-');
-      const fecha = new Date(parseInt(anio), parseInt(mes) - 1, 1);
+      const fecha = new Date(parseInt(anio, 10), parseInt(mes, 10) - 1, 1);
       const nombreMes = fecha.toLocaleString('es-ES', { month: 'long' });
       const nombreMesCapitalizado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
       nombreArchivo = `SistemaGastos_${nombreMesCapitalizado}_${anio}.xlsx`;
@@ -254,9 +271,9 @@ export default function Dashboard() {
         )}
 
         <form onSubmit={handleSmartSubmit} className="gasto-form">
-          <input 
-            type="text" 
-            placeholder="Ej: Gasté 15 en almuerzo ayer, Uber 8.50..." 
+          <input
+            type="text"
+            placeholder="Ej: Gasté 15 en almuerzo ayer, Uber 8.50..."
             value={fraseIa}
             onChange={(e) => setFraseIa(e.target.value)}
             className="smart-parser-input"
@@ -274,16 +291,16 @@ export default function Dashboard() {
         {error && <div className="dashboard-error-alert">{error}</div>}
 
         <form onSubmit={handleSubmit} className="gasto-form">
-          <input 
-            type="text" 
-            placeholder="Concepto (ej. Almuerzo)" 
+          <input
+            type="text"
+            placeholder="Concepto (ej. Almuerzo)"
             value={concepto}
             onChange={(e) => setConcepto(e.target.value)}
           />
-          <input 
-            type="number" 
-            step="0.01" 
-            placeholder="Monto ($)" 
+          <input
+            type="number"
+            step="0.01"
+            placeholder="Monto ($)"
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
           />
@@ -310,14 +327,14 @@ export default function Dashboard() {
             <h3>Gastos Recientes</h3>
             <p>Historial detallado de tus movimientos</p>
           </div>
-          
+
           <div className="dashboard-filters-group">
             {/* Filtro por Mes */}
             <div className="filter-box-modern">
               <span className="filter-icon">📅</span>
-              <select 
+              <select
                 className="dashboard-filter-dropdown"
-                value={mesFiltro} 
+                value={mesFiltro}
                 onChange={(e) => setMesFiltro(e.target.value)}
               >
                 <option value="Todos">Todos los meses</option>
@@ -332,9 +349,9 @@ export default function Dashboard() {
             {/* Filtro por Categoría */}
             <div className="filter-box-modern">
               <span className="filter-icon">🔍</span>
-              <select 
+              <select
                 className="dashboard-filter-dropdown"
-                value={categoriaFiltro} 
+                value={categoriaFiltro}
                 onChange={(e) => setCategoriaFiltro(e.target.value)}
               >
                 <option value="Todas">Todas las categorías</option>
@@ -350,8 +367,8 @@ export default function Dashboard() {
             </div>
 
             {/* Botón de Exportar a Excel Pro */}
-            <button 
-              onClick={exportarExcel} 
+            <button
+              onClick={exportarExcel}
               className="dashboard-export-btn"
               title="Descargar reporte profesional en formato Excel (.xlsx)"
             >
@@ -375,19 +392,19 @@ export default function Dashboard() {
               gastosMostrados.map((gasto) => (
                 <tr key={gasto.id}>
                   <td>{gasto.concepto}</td>
-                  <td>{gasto.categoria}</td>
+                  <td>{normalizarCategoria(gasto.categoria)}</td>
                   <td>{formatearFechaVisual(gasto.fecha)}</td>
                   <td className="monto-celda">${gasto.monto.toFixed(2)}</td>
                   <td>
                     <div className="dashboard-acciones-celda">
-                      <button 
-                        onClick={() => iniciarEdicion(gasto)} 
+                      <button
+                        onClick={() => iniciarEdicion(gasto)}
                         className="dashboard-action-edit-btn"
                       >
                         Editar
                       </button>
-                      <button 
-                        onClick={() => setIdConfirmando(gasto.id)} 
+                      <button
+                        onClick={() => setIdConfirmando(gasto.id)}
                         className="dashboard-action-delete-btn"
                       >
                         Eliminar
@@ -414,14 +431,14 @@ export default function Dashboard() {
             <h3>Confirmar Eliminación</h3>
             <p>¿Estás segura de que deseas eliminar este gasto del sistema?</p>
             <div className="dashboard-modal-buttons">
-              <button 
-                onClick={() => eliminarGasto(idConfirmando)} 
+              <button
+                onClick={() => eliminarGasto(idConfirmando)}
                 className="dashboard-modal-confirm-btn"
               >
                 Sí, eliminar
               </button>
-              <button 
-                onClick={() => setIdConfirmando(null)} 
+              <button
+                onClick={() => setIdConfirmando(null)}
                 className="dashboard-modal-cancel-btn"
               >
                 Cancelar
