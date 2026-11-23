@@ -8,7 +8,6 @@ import Layout from './Components/Layout';
 import Statistics from './Pages/Statistics';
 
 export default function App() {
-  // Verificamos si el usuario ya estaba autenticado en la memoria del navegador
   const [autenticado, setAutenticado] = useState(() => {
     return localStorage.getItem('isAutenticado') === 'true';
   });
@@ -18,26 +17,31 @@ export default function App() {
     setAutenticado(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('isAutenticado');
+    setAutenticado(false);
+  };
+
   return (
     <Router>
       <Routes>
         {/* Ruta de Autenticación / Login */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             autenticado ? (
               <Navigate to="/dashboard" replace />
             ) : (
               <Auth onLoginSuccess={handleLoginSuccess} />
             )
-          } 
+          }
         />
 
-        {/* Rutas Protegidas envueltas en el Layout (Incluyen la Navbar automáticamente) */}
-        <Route 
+        {/* Rutas Protegidas envueltas en el Layout */}
+        <Route
           element={
             autenticado ? (
-              <Layout />
+              <Layout onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" replace />
             )

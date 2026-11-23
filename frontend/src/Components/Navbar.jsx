@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
-export default function Navbar() {
+export default function Navbar({ onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [nombre, setNombre] = useState('Bethmeriugu');
   const [avatarFoto, setAvatarFoto] = useState('');
-  
+
   // Estado para el Modo Oscuro / Claro
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
@@ -38,14 +38,17 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAutenticado');
-    navigate('/login');
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem('isAutenticado');
+    }
+    navigate('/login', { replace: true });
   };
 
   return (
     <header className="navbar-clean-header">
       <div className="navbar-clean-container">
-        
         {/* Logo y Marca */}
         <div className="navbar-brand-group" onClick={() => navigate('/dashboard')}>
           <div className="navbar-brand-icon">💳</div>
@@ -54,23 +57,22 @@ export default function Navbar() {
 
         {/* Pestañas de Navegación Centrales */}
         <nav className="navbar-center-tabs">
-          <Link 
-            to="/dashboard" 
+          <Link
+            to="/dashboard"
             className={`nav-tab-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
           >
             <span>📊</span> Dashboard
           </Link>
-          
-          {/* 👇 ¡Aquí está integrada la nueva pestaña de Estadísticas! */}
-          <Link 
-            to="/estadisticas" 
+
+          <Link
+            to="/estadisticas"
             className={`nav-tab-item ${location.pathname === '/estadisticas' ? 'active' : ''}`}
           >
             <span>📈</span> Estadísticas
           </Link>
 
-          <Link 
-            to="/perfil" 
+          <Link
+            to="/perfil"
             className={`nav-tab-item ${location.pathname === '/perfil' ? 'active' : ''}`}
           >
             <span>👤</span> Mi Perfil
@@ -79,11 +81,9 @@ export default function Navbar() {
 
         {/* Sección Derecha: Botón de Tema, Usuario y Salida */}
         <div className="navbar-right-group">
-          
-          {/* Botón para alternar Modo Claro / Oscuro */}
-          <button 
-            onClick={toggleTheme} 
-            className="theme-toggle-btn" 
+          <button
+            onClick={toggleTheme}
+            className="theme-toggle-btn"
             title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
           >
             {isDarkMode ? '☀️' : '🌙'}
@@ -105,7 +105,6 @@ export default function Navbar() {
             <span>🚪</span>
           </button>
         </div>
-
       </div>
     </header>
   );
