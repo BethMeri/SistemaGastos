@@ -5,7 +5,8 @@ import {
   guardarPresupuestoTotal,
   obtenerAsignacionesCategoria,
   guardarAsignacionesCategoria,
-  analizarDistribucionMes
+  analizarDistribucionMes,
+  formatearMoneda
 } from '../utils/budgetInsights';
 import '../Styles/Statistics.css';
 
@@ -144,17 +145,17 @@ const Statistics = () => {
       <div className="stats-cards-grid">
         <div className="stat-card">
           <h3>Gasto del Mes</h3>
-          <p className="stat-value">${analisis.totalGastado.toFixed(2)}</p>
-          <span className="stat-hint">de ${analisis.presupuestoTotal.toFixed(2)} presupuestados</span>
+          <p className="stat-value">${formatearMoneda(analisis.totalGastado)}</p>
+          <span className="stat-hint">de ${formatearMoneda(analisis.presupuestoTotal)} presupuestados</span>
         </div>
 
         <div className="stat-card">
           <h3>Asignado en Categorías</h3>
-          <p className="stat-value">${analisis.totalAsignado.toFixed(2)}</p>
+          <p className="stat-value">${formatearMoneda(analisis.totalAsignado)}</p>
           <span className="stat-hint">
             {analisis.restantePorAsignar >= 0
-              ? `$${analisis.restantePorAsignar.toFixed(2)} libres por asignar`
-              : `$${Math.abs(analisis.restantePorAsignar).toFixed(2)} por encima del total`}
+              ? `$${formatearMoneda(analisis.restantePorAsignar)} libres por asignar`
+              : `$${formatearMoneda(Math.abs(analisis.restantePorAsignar))} por encima del total`}
           </span>
         </div>
 
@@ -165,7 +166,7 @@ const Statistics = () => {
           </p>
           <span className="stat-hint">
             {categoriaMayor
-              ? `$${categoriaMayor.gastado.toFixed(2)} de $${categoriaMayor.asignado.toFixed(2)} asignados`
+              ? `$${formatearMoneda(categoriaMayor.gastado)} de $${formatearMoneda(categoriaMayor.asignado)} asignados`
               : '—'}
           </span>
         </div>
@@ -221,13 +222,13 @@ const Statistics = () => {
           <form onSubmit={handleGuardarReparto} className="category-split-panel">
             <div className="split-summary-bar">
               <span>
-                Repartido: <strong>${sumaBorrador.toFixed(2)}</strong> de{' '}
-                <strong>${presupuestoTotal.toFixed(2)}</strong>
+                Repartido: <strong>${formatearMoneda(sumaBorrador)}</strong> de{' '}
+                <strong>${formatearMoneda(presupuestoTotal)}</strong>
               </span>
               <span className={diferenciaBorrador < 0 ? 'split-over' : 'split-ok'}>
                 {diferenciaBorrador >= 0
-                  ? `Disponible para asignar: $${diferenciaBorrador.toFixed(2)}`
-                  : `Excedido en reparto: +$${Math.abs(diferenciaBorrador).toFixed(2)}`}
+                  ? `Disponible para asignar: $${formatearMoneda(diferenciaBorrador)}`
+                  : `Excedido en reparto: +$${formatearMoneda(Math.abs(diferenciaBorrador))}`}
               </span>
             </div>
 
@@ -263,8 +264,8 @@ const Statistics = () => {
         <div className="budget-progress-wrapper">
           <div className="budget-numbers">
             <span>
-              Gastado este mes: <strong>${analisis.totalGastado.toFixed(2)}</strong> de{' '}
-              <strong>${analisis.presupuestoTotal.toFixed(2)}</strong>
+              Gastado este mes: <strong>${formatearMoneda(analisis.totalGastado)}</strong> de{' '}
+              <strong>${formatearMoneda(analisis.presupuestoTotal)}</strong>
             </span>
             <span className={`budget-percent badge-${analisis.estadoGlobal}`}>
               {analisis.porcentajeGlobal.toFixed(1)}%
@@ -286,8 +287,8 @@ const Statistics = () => {
               <span>🚨</span>
               <span>
                 <strong>Alerta IA:</strong> Superaste tu presupuesto mensual de $
-                {analisis.presupuestoTotal.toFixed(2)} por{' '}
-                <strong>${Math.abs(analisis.restanteGlobal).toFixed(2)}</strong>.
+                {formatearMoneda(analisis.presupuestoTotal)} por{' '}
+                <strong>${formatearMoneda(Math.abs(analisis.restanteGlobal))}</strong>.
               </span>
             </div>
           )}
@@ -297,7 +298,7 @@ const Statistics = () => {
               <span>⚠️</span>
               <span>
                 <strong>Aviso IA:</strong> Llevas el {analisis.porcentajeGlobal.toFixed(1)}% de tu presupuesto mensual;
-                te quedan <strong>${analisis.restanteGlobal.toFixed(2)}</strong> disponibles.
+                te quedan <strong>${formatearMoneda(analisis.restanteGlobal)}</strong> disponibles.
               </span>
             </div>
           )}
@@ -307,7 +308,7 @@ const Statistics = () => {
               <span>✅</span>
               <span>
                 <strong>Diagnóstico IA:</strong> Has usado el {analisis.porcentajeGlobal.toFixed(1)}% de tu presupuesto
-                mensual y aún tienes <strong>${analisis.restanteGlobal.toFixed(2)}</strong> disponibles.
+                mensual y aún tienes <strong>${formatearMoneda(analisis.restanteGlobal)}</strong> disponibles.
               </span>
             </div>
           )}
@@ -320,7 +321,7 @@ const Statistics = () => {
                 {analisis.categoriasExcedidas
                   .map(
                     (c) =>
-                      `${c.nombre} ($${c.gastado.toFixed(2)} / $${c.asignado.toFixed(2)})`
+                      `${c.nombre} ($${formatearMoneda(c.gastado)} / $${formatearMoneda(c.asignado)})`
                   )
                   .join(', ')}
                 .
@@ -337,11 +338,11 @@ const Statistics = () => {
               <span>🤖</span>
               <span>
                 <strong>Proyección IA:</strong> A tu ritmo promedio actual (~$
-                {analisis.promedioDiario.toFixed(2)}/día), cerrarías el mes en{' '}
-                <strong>~${analisis.proyectadoFinMes.toFixed(2)}</strong>
+                {formatearMoneda(analisis.promedioDiario)}/día), cerrarías el mes en{' '}
+                <strong>~${formatearMoneda(analisis.proyectadoFinMes)}</strong>
                 {analisis.proyectadoFinMes > analisis.presupuestoTotal
-                  ? `, por encima de tu presupuesto de $${analisis.presupuestoTotal.toFixed(2)}.`
-                  : `, dentro de tu presupuesto de $${analisis.presupuestoTotal.toFixed(2)}.`}
+                  ? `, por encima de tu presupuesto de $${formatearMoneda(analisis.presupuestoTotal)}.`
+                  : `, dentro de tu presupuesto de $${formatearMoneda(analisis.presupuestoTotal)}.`}
               </span>
             </div>
           )}
@@ -354,7 +355,7 @@ const Statistics = () => {
           <h3>Consumo por Categoría ({formatearMesNombre(mesSeleccionado)})</h3>
           <p className="budget-sub">
             Comparativa de lo gastado en cada rubro frente al monto asignado de tu presupuesto de $
-            {analisis.presupuestoTotal.toFixed(2)}
+            {formatearMoneda(analisis.presupuestoTotal)}
           </p>
         </div>
 
@@ -370,10 +371,10 @@ const Statistics = () => {
                   </span>
                   <div className="cat-metrics">
                     <span className="cat-amount">
-                      <strong>${cat.gastado.toFixed(2)}</strong> / ${cat.asignado.toFixed(2)} asignados ·{' '}
+                      <strong>${formatearMoneda(cat.gastado)}</strong> / ${formatearMoneda(cat.asignado)} asignados ·{' '}
                       {cat.disponibleCat >= 0
-                        ? `Quedan $${cat.disponibleCat.toFixed(2)}`
-                        : `Excedido por $${Math.abs(cat.disponibleCat).toFixed(2)}`}
+                        ? `Quedan $${formatearMoneda(cat.disponibleCat)}`
+                        : `Excedido por $${formatearMoneda(Math.abs(cat.disponibleCat))}`}
                     </span>
                     <span className={`cat-pill pill-${cat.estado}`}>
                       {cat.porcentajeUso > 99 && cat.porcentajeUso < 100

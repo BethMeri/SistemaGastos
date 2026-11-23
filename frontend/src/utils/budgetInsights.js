@@ -14,6 +14,15 @@ export const CATEGORIAS_BASE = [
   { nombre: 'Otros', icono: '📦', asignacionDefecto: 100 }
 ];
 
+export const formatearMoneda = (valor) => {
+  const numero = Number(valor);
+  if (!Number.isFinite(numero)) return '0.00';
+  return numero.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
 export const normalizarCategoria = (cat) => {
   if (!cat) return 'Otros';
   const limpia = cat.trim();

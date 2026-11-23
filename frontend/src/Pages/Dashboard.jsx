@@ -2,15 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { parsearGastoInteligente } from '../utils/smartParser';
+import { formatearMoneda, normalizarCategoria } from '../utils/budgetInsights';
 import '../Styles/Dashboard.css';
-
-const normalizarCategoria = (cat) => {
-  if (!cat) return 'Otros';
-  if (cat.trim().toLowerCase() === 'alimentación' || cat.trim().toLowerCase() === 'alimentacion') {
-    return 'Alimentos';
-  }
-  return cat;
-};
 
 export default function Dashboard() {
   const [gastos, setGastos] = useState(() => {
@@ -81,7 +74,7 @@ export default function Dashboard() {
     };
 
     setGastos([nuevoGasto, ...gastos]);
-    setMensajeIaExito(`✨ ¡IA detectó con éxito! (${categoriaLimpia} - $${gastoExtraido.monto})`);
+    setMensajeIaExito(`✨ ¡IA detectó con éxito! (${categoriaLimpia} - $${formatearMoneda(gastoExtraido.monto)})`);
     setFraseIa('');
 
     setTimeout(() => {
@@ -254,7 +247,7 @@ export default function Dashboard() {
       {/* Tarjeta de Resumen */}
       <div className="card-resumen">
         <h3>TOTAL GASTADO</h3>
-        <p className="monto-total">${totalGastos.toFixed(2)}</p>
+        <p className="monto-total">${formatearMoneda(totalGastos)}</p>
       </div>
 
       {/* 🤖 Tarjeta de Entrada Rápida con Smart Parser (AI) */}
@@ -394,7 +387,7 @@ export default function Dashboard() {
                   <td>{gasto.concepto}</td>
                   <td>{normalizarCategoria(gasto.categoria)}</td>
                   <td>{formatearFechaVisual(gasto.fecha)}</td>
-                  <td className="monto-celda">${gasto.monto.toFixed(2)}</td>
+                  <td className="monto-celda">${formatearMoneda(gasto.monto)}</td>
                   <td>
                     <div className="dashboard-acciones-celda">
                       <button
