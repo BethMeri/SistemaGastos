@@ -1,93 +1,140 @@
 /* frontend/src/utils/budgetInsights.js */
 
-const CLAVE_PRESUPUESTO = 'sistema_gastos_presupuesto';
+const CLAVE_PRESUPUESTO_TOTAL = 'sistema_gastos_presupuesto_total';
+const CLAVE_ASIGNACIONES_CAT = 'sistema_gastos_asignaciones_cat';
 
-export const obtenerPresupuestoMensual = () => {
-  const guardado = localStorage.getItem(CLAVE_PRESUPUESTO);
-  const valor = guardado ? parseFloat(guardado) : 500;
-  return Number.isFinite(valor) && valor > 0 ? valor : 500;
+export const CATEGORIAS_BASE = [
+  { nombre: 'Alimentos', icono: '🍔', asignacionDefecto: 60 },
+  { nombre: 'Transporte', icono: '🚗', asignacionDefecto: 80 },
+  { nombre: 'Servicios', icono: '💡', asignacionDefecto: 100 },
+  { nombre: 'Suscripciones', icono: '⚡', asignacionDefecto: 50 },
+  { nombre: 'Entretenimiento', icono: '🎮', asignacionDefecto: 70 },
+  { nombre: 'Tecnología', icono: '💻', asignacionDefecto: 250 },
+  { nombre: 'Hogar', icono: '🏠', asignacionDefecto: 150 },
+  { nombre: 'Otros', icono: '📦', asignacionDefecto: 100 }
+];
+
+export const normalizarCategoria = (cat) => {
+  if (!cat) return 'Otros';
+  const limpia = cat.trim();
+  if (limpia.toLowerCase() === 'alimentación' || limpia.toLowerCase() === 'alimentacion') {
+    return 'Alimentos';
+  }
+  return limpia;
 };
 
-export const guardarPresupuestoMensual = (monto) => {
+export const obtenerPresupuestoTotal = () => {
+  const guardado = parseFloat(localStorage.getItem(CLAVE_PRESUPUESTO_TOTAL));
+  return Number.isFinite(guardado) && guardado > 0 ? guardado : 1000;
+};
+
+export const guardarPresupuestoTotal = (monto) => {
   const limpio = parseFloat(monto);
   if (!Number.isFinite(limpio) || limpio <= 0) return null;
-  localStorage.setItem(CLAVE_PRESUPUESTO, String(limpio));
+  localStorage.setItem(CLAVE_PRESUPUESTO_TOTAL, String(limpio));
   return limpio;
 };
 
-export const analizarPresupuesto = (gastosMes, presupuestoMensual, mesSeleccionado) => {
-  const totalGastado = gastosMes.reduce((acc, item) => acc + (Number(item.monto) || 0), 0);
-  const presupuesto = Number(presupuestoMensual) > 0 ? Number(presupuestoMensual) : 1;
+export const obtenerAsignacionesCategoria = () => {
+  const defaults = CATEGORIAS_BASE.reduce((acc, item) => {
+    acc[item.nombre] = item.asignacionDefecto;
+    return acc;
+  }, {});
 
-  const porcentaje = (totalGastado / presupuesto) * 100;
-  const porcentajeBarra = Math.min(porcentaje, 100);
-  const diferencia = presupuesto - totalGastado;
-
-  let estado = 'normal'; // 'normal' | 'alerta' | 'excedido'
-  if (porcentaje >= 100) {
-    estado = 'excedido';
-  } else if (porcentaje >= 75) {
-    estado = 'alerta';
+  try {
+    const guardado = JSON.parse(localStorage.getItem(CLAVE_ASIGNACIONES_CAT));
+    if (guardado && typeof guardado === 'object') {
+      return { ...defaults, ...guardado };
+    }
+  } catch (e) {
+    console.error('Error leyendo asignaciones por categoría:', e);
   }
+  return defaults;
+};
 
-  // Cálculo de proyección según el mes seleccionado ("YYYY-MM")
+export const guardarAsignacionesCategoria = (asignaciones) => {
+  localStorage.setItem(CLAVE_ASIGNACIONES_CAT, JSON.stringify(asignaciones));
+  return asignaciones;
+};
+
+export const analizarDistribucionMes = (gastosMes, presupuestoTotal, asignacionesCat, mesSeleccionado) => {
+  const gastadoPorCat = gastosMes.reduce((acc, item) => {
+    const cat = normalizarCategoria(item.categoria);
+    acc[cat] = (acc[cat] || 0) + (Number(item.monto) || 0);
+    return acc;
+  }, {});
+
+  const totalGastado = Object.values(gastadoPorCat).reduce((a, b) => a + b, 0);
+  const totalAsignado = Object.values(asignacionesCat).reduce((a, b) => a + (Number(b) || 0), 0);
+  const restantePorAsignar = presupuestoTotal - totalAsignado;
+
+  const porcentajeGlobal = presupuestoTotal > 0 ? (totalGastado / presupuestoTotal) * 100 : 0;
+  const restanteGlobal = presupuestoTotal - totalGastado;
+
+  let estadoGlobal = 'normal';
+  if (porcentajeGlobal >= 100) estadoGlobal = 'excedido';
+  else if (porcentajeGlobal >= 75) estadoGlobal = 'alerta';
+
+  const nombresCategorias = Array.from(
+    new Set([...CATEGORIAS_BASE.map((c) => c.nombre), ...Object.keys(gastadoPorCat)])
+  );
+
+  const categorias = nombresCategorias
+    .map((nombre) => {
+      const meta = CATEGORIAS_BASE.find((c) => c.nombre === nombre);
+      const icono = meta ? meta.icono : '📦';
+      const gastado = gastadoPorCat[nombre] || 0;
+      const asignado = Number(asignacionesCat[nombre]) || 0;
+
+      const porcentajeUso = asignado > 0 ? (gastado / asignado) * 100 : gastado > 0 ? 100 : 0;
+      const porcentajeDeBolsa = presupuestoTotal > 0 ? (asignado / presupuestoTotal) * 100 : 0;
+      const disponibleCat = asignado - gastado;
+
+      let estado = 'normal';
+      if (asignado > 0 && gastado > asignado) estado = 'excedido';
+      else if (asignado > 0 && porcentajeUso >= 75) estado = 'alerta';
+      else if (asignado === 0 && gastado > 0) estado = 'excedido';
+
+      return {
+        nombre,
+        icono,
+        gastado,
+        asignado,
+        disponibleCat,
+        porcentajeUso,
+        porcentajeBarra: Math.min(porcentajeUso, 100),
+        porcentajeDeBolsa,
+        estado
+      };
+    })
+    .sort((a, b) => b.gastado - a.gastado || b.asignado - a.asignado);
+
+  // Proyección del mes según ritmo diario
   const [anioStr, mesStr] = mesSeleccionado.split('-');
   const anio = parseInt(anioStr, 10);
   const mes = parseInt(mesStr, 10) - 1;
   const diasEnMes = new Date(anio, mes + 1, 0).getDate();
-
   const hoy = new Date();
   const esMesActual = hoy.getFullYear() === anio && hoy.getMonth() === mes;
   const diaTranscurrido = esMesActual ? Math.max(hoy.getDate(), 1) : diasEnMes;
-
   const promedioDiario = totalGastado / diaTranscurrido;
   const proyectadoFinMes = promedioDiario * diasEnMes;
 
-  const insights = [];
-
-  if (estado === 'excedido') {
-    insights.push({
-      tipo: 'danger',
-      icono: '🚨',
-      texto: `¡Alerta! Superaste tu presupuesto mensual por $${Math.abs(diferencia).toFixed(2)} (${porcentaje.toFixed(1)}% usado).`
-    });
-  } else if (estado === 'alerta') {
-    insights.push({
-      tipo: 'warning',
-      icono: '⚠️',
-      texto: `Precaución: ya consumiste el ${porcentaje.toFixed(1)}% de tu presupuesto. Te quedan $${diferencia.toFixed(2)} disponibles.`
-    });
-  } else {
-    insights.push({
-      tipo: 'success',
-      icono: '✅',
-      texto: `Vas muy bien: has usado el ${porcentaje.toFixed(1)}% de tu presupuesto y aún cuentas con $${diferencia.toFixed(2)}.`
-    });
-  }
-
-  if (totalGastado > 0) {
-    if (esMesActual && proyectadoFinMes > presupuesto && estado !== 'excedido') {
-      insights.push({
-        tipo: 'warning',
-        icono: '📈',
-        texto: `Predicción de ritmo: gastando ~$${promedioDiario.toFixed(2)}/día, cerrarías el mes alrededor de $${proyectadoFinMes.toFixed(2)}, superando tu meta.`
-      });
-    } else if (esMesActual) {
-      insights.push({
-        tipo: 'info',
-        icono: '🧠',
-        texto: `Proyección a fin de mes: ~$${proyectadoFinMes.toFixed(2)} (promedio de $${promedioDiario.toFixed(2)} diarios).`
-      });
-    }
-  }
+  const categoriasExcedidas = categorias.filter((c) => c.estado === 'excedido');
 
   return {
     totalGastado,
-    presupuesto,
-    porcentaje,
-    porcentajeBarra,
-    diferencia,
-    estado,
-    insights
+    presupuestoTotal,
+    totalAsignado,
+    restantePorAsignar,
+    porcentajeGlobal,
+    porcentajeBarraGlobal: Math.min(porcentajeGlobal, 100),
+    restanteGlobal,
+    estadoGlobal,
+    categorias,
+    categoriasExcedidas,
+    esMesActual,
+    promedioDiario,
+    proyectadoFinMes
   };
 };
