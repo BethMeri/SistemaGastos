@@ -497,3 +497,115 @@
   color: #a7f3d0 !important;
   border-color: #047857 !important;
 }
+
+/* Responsive - Tablets y Celulares */
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin: 20px auto;
+    padding: 0 14px;
+    width: 100%;
+  }
+
+  .dashboard-header h1 {
+    font-size: 20px;
+  }
+
+  .card-resumen,
+  .form-container,
+  .smart-parser-card,
+  .tabla-container {
+    padding: 18px 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .monto-total {
+    font-size: 26px;
+  }
+
+  .gasto-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gasto-form input,
+  .gasto-form select,
+  .smart-parser-input,
+  .gasto-form button {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+  }
+
+  .dashboard-table-header-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-modal-overlay {
+    padding: 16px;
+  }
+
+  .dashboard-modal-card {
+    padding: 22px 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Scroll horizontal limpio para la tabla en pantallas angostas */
+  .tabla-gastos {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  .tabla-gastos th,
+  .tabla-gastos td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-filters-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .filter-box-modern,
+  .dashboard-export-btn {
+    width: 100%;
+  }
+
+  .filter-box-modern {
+    justify-content: space-between;
+  }
+
+  .dashboard-export-btn {
+    justify-content: center;
+  }
+
+  .dashboard-filter-dropdown {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .smart-parser-header h3,
+  .form-container h3,
+  .table-title-group h3 {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .dashboard-modal-buttons {
+    flex-direction: column;
+  }
+
+  .dashboard-modal-confirm-btn,
+  .dashboard-modal-cancel-btn {
+    width: 100%;
+  }
+}

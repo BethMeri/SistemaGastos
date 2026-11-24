@@ -193,3 +193,118 @@
   transform: scale(1.05);
   box-shadow: 0 2px 8px rgba(39, 174, 96, 0.2);
 }
+
+/* Responsive - Tablets y Celulares */
+@media (max-width: 960px) {
+  .navbar-clean-container {
+    height: auto;
+    min-height: 70px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-center-tabs {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-tab-item {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 540px) {
+  .navbar-clean-container {
+    padding: 10px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .navbar-brand-group {
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .navbar-brand-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  .navbar-brand-text {
+    font-size: 14.5px;
+  }
+
+  .navbar-right-group {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .navbar-user-pill {
+    padding: 3px 8px 3px 4px;
+    gap: 6px;
+  }
+
+  .navbar-user-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 12px;
+  }
+
+  .navbar-user-name {
+    max-width: 62px;
+    font-size: 11.5px;
+  }
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .navbar-logout-btn {
+    padding: 6px 9px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 420px) {
+  .navbar-clean-container {
+    padding: 10px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .navbar-right-group {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .navbar-user-pill {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 3px 12px 3px 4px;
+  }
+
+  .navbar-user-name {
+    max-width: 80px;
+    font-size: 12px;
+  }
+
+  .navbar-logout-btn {
+    margin-left: auto;
+    padding: 7px 12px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+}
